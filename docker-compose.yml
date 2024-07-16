@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      dockerfile: deploy/Dockerfile
+      target: deploy-app
+    env_file:
+      - ./deployment/docker.env
+    network_mode: "service:localhost"
+    depends_on:
+      - postgres
+    volumes:
+      - ./app:/app/app
+  postgres:
+    image: postgres:16.3-alpine
+    restart: always
+    env_file:
+      - ./deployment/docker.env
+    ports:
+      - "5434:5434"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+volumes:
+  postgres:
+    driver: local

@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "weather-forecast"
+version = "0.1.0"
+description = ""
+authors = ["Edhar Strelchanka <strelchenkoedgar@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.111.1"
+sqlalchemy = "^2.0.31"
+pydantic = "^2.8.2"
+alembic = "^1.13.2"
+pytest = "^8.2.2"
+pytest-factoryboy = "^2.7.0"
+pre-commit = "^3.7.1"
+pytest-mock = "^3.14.0"
+coverage = "^7.6.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

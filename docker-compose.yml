@@ -3,11 +3,12 @@ version: '3.8'
 services:
   web:
     build:
-      dockerfile: deploy/Dockerfile
+      dockerfile: deployment/Dockerfile
       target: deploy-app
     env_file:
       - ./deployment/docker.env
-    network_mode: "service:localhost"
+    ports:
+      - "8000:8000"
     depends_on:
       - postgres
     volumes:

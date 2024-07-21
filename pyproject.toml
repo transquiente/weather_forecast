@@ -16,6 +16,8 @@ pytest-factoryboy = "^2.7.0"
 pre-commit = "^3.7.1"
 pytest-mock = "^3.14.0"
 coverage = "^7.6.0"
+pydantic-extra-types = "^2.9.0"
+uvicorn = "^0.30.3"
 
 
 [build-system]

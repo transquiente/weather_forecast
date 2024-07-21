@@ -15,6 +15,7 @@ RUN addgroup -S nonroot && adduser -S nonroot -G nonroot
 WORKDIR /app
 COPY pyproject.toml alembic.ini /app/
 COPY migrations /app/migrations
+COPY tools /app/tools
 COPY app /app/app
 
 FROM app-base AS deploy-app

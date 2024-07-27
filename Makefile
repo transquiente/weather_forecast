@@ -20,3 +20,6 @@ down:
 
 ps:
 	@docker ps
+
+lint:
+	@poetry run mypy .

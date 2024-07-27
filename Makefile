@@ -20,3 +20,18 @@ down:
 
 ps:
 	@docker ps
+
+lint:
+	@poetry run mypy .
+# Lint all files in the current directory.
+	@poetry run ruff check .
+# Exit with a non-zero status code upon detecting any unformatted files.
+	@poetry run ruff format --check .
+
+format:
+# Sorting imports
+	@poetry run ruff check --select I --fix .
+# Lint all files in the current directory, and fix any fixable errors.
+	@poetry run ruff check --fix .
+# Format all files in the current directory.
+	@poetry run ruff format .

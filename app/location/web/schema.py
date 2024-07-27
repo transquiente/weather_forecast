@@ -17,3 +17,4 @@ class LocationSchema(BaseSchema):
     def validate_coordinate(cls, coordinate: Coordinate | None) -> Coordinate:
         if not coordinate:
             return Coordinate(latitude=Latitude(35.68518230181968), longitude=Longitude(139.75279840684516))
+        return coordinate

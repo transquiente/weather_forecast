@@ -1,4 +1,4 @@
-from  dataclasses import dataclass
+from dataclasses import dataclass
 
 from app.location.web.schema import LocationSchema
 

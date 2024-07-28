@@ -1,0 +1,44 @@
+name: CI - Code Validation Pipeline
+
+on:
+  workflow_call:
+
+jobs:
+  code-validation:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16.3-alpine
+        env:
+          POSTGRES_PASSWORD: ${{ secrets.PIPELINE_DB_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.PIPELINE_DB_DATABASE }}
+          POSTGRES_USER: ${{ secrets.PIPELINE_DB_USERNAME }}
+        options: >-
+          --health-cmd="pg_isready"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5434:5432
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install poetry
+        run: pipx install poetry
+      - name: Set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: pyproject.toml
+          cache: 'poetry'
+      - name: Switch to env
+        run: poetry env use python3.10
+      - name: Install dependencies
+        run: poetry install
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          while ! pg_isready -h localhost -p 5434; do
+            echo "Waiting for PostgreSQL to be ready..."
+            sleep 5
+          done
+      - name: Run Linters
+        run: make lint

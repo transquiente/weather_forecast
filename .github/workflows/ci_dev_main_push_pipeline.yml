@@ -1,0 +1,17 @@
+name: CI DEV/MAIN - Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  code-validation:
+    name: Code Validation
+    secrets: inherit
+    uses: './.github/workflows/ci_code_validation.yml'

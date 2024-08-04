@@ -8,11 +8,11 @@ DEFAULT_DB_SCHEME = "postgresql+psycopg2"
 
 class DBSettings(BaseSettings):
     scheme: str = DEFAULT_DB_SCHEME
-    username: str
-    password: str
-    host: str
-    port: int
-    database: str
+    username: str = ""
+    password: str = ""
+    host: str = ""
+    port: int = 0
+    database: str = ""
     pool_size: int = 15
     max_overflow: int = 10
 

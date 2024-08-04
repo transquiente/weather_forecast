@@ -24,4 +24,5 @@ class GetLocationUseCase:
                 street_address="1-1 Chiyoda",
                 zip_code="100-0001",
             )
-        return LocationSchema.model_validate(location)  # type: ignore
+        location_schema: LocationSchema = LocationSchema.model_validate(location)
+        return location_schema

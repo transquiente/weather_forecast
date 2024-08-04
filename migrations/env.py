@@ -41,7 +41,7 @@ def process_revision_directives(
     directives: list[MigrationScript],
 ) -> None:
     migration_script = directives[0]
-    head_revision = ScriptDirectory.from_config(context.config).get_current_head()
+    head_revision = ScriptDirectory.from_config(context.config).get_current_head()  # type: ignore
     if head_revision is None:
         new_rev_id = 1
     else:

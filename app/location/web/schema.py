@@ -12,6 +12,9 @@ class LocationSchema(BaseSchema):
     street_address: str | None
     zip_code: str | None
 
+    class Config:
+        from_attributes = True
+
     @field_validator("coordinate")
     @classmethod
     def validate_coordinate(cls, coordinate: Coordinate | None) -> Coordinate:

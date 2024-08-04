@@ -21,6 +21,10 @@ uvicorn = "^0.30.3"
 mypy = "^1.11.0"
 ruff = "^0.5.5"
 pre-commit-hooks = "^4.6.0"
+pydantic-settings = "^2.3.4"
+psycopg2-binary = "^2.9.9"
+alembic-utils = "^0.8.4"
+alembic-postgresql-enum = "^1.3.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -36,7 +40,7 @@ implicit_optional = true
 strict_optional = true
 # Configuring warnings
 warn_redundant_casts = true
-warn_unused_ignores = true
+warn_unused_ignores = false
 warn_no_return = true
 warn_return_any = true
 warn_unreachable = true

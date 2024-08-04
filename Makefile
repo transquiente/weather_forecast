@@ -1,4 +1,4 @@
-include deployment/docker.env
+include deployment/local.env
 export
 
 # there should be tabs not white spaces - will be an error
@@ -20,6 +20,18 @@ down:
 
 ps:
 	@docker ps
+
+migration: postgres
+	@poetry run alembic revision --autogenerate -m "$(args)"
+
+check: postgres
+	@poetry run alembic check
+
+migrate: postgres
+	@poetry run alembic upgrade head
+
+downgrade: postgres
+	@poetry run alembic downgrade -1
 
 lint:
 	@poetry run mypy .

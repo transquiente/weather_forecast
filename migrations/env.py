@@ -1,7 +1,16 @@
+from collections.abc import Iterable
 from logging.config import fileConfig
+from uuid import uuid4
 
 from alembic import context
-from sqlalchemy import engine_from_config, pool
+from alembic.operations.ops import MigrationScript
+from alembic.runtime.migration import MigrationContext
+from alembic.script import ScriptDirectory
+from sqlalchemy import create_engine, pool
+
+from app.core.model import Base
+from app.core.repository.sql import get_settings
+from tools.load_db_models import load_db_models
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -16,12 +25,29 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = None
+load_db_models()
+target_metadata = [Base.metadata]
+
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
+
+
+def process_revision_directives(
+    context: MigrationContext,
+    revision: Iterable,
+    directives: list[MigrationScript],
+) -> None:
+    migration_script = directives[0]
+    head_revision = ScriptDirectory.from_config(context.config).get_current_head()  # type: ignore
+    if head_revision is None:
+        new_rev_id = 1
+    else:
+        last_rev_id = int(head_revision.split("ver")[0].lstrip("0"))
+        new_rev_id = last_rev_id + 1
+    migration_script.rev_id = "ver".join([f"{new_rev_id:04}", str(uuid4()).replace("-", "")[:8]])
 
 
 def run_migrations_offline() -> None:
@@ -55,15 +81,17 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    url = config.get_main_option("sqlalchemy.url", get_settings().dsn)
+    engine = create_engine(url, pool_pre_ping=True, poolclass=pool.NullPool)
 
-    with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
-
+    with engine.connect() as connection:
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+            transactional_ddl=True,  # use ddl operation inside a transaction
+            transaction_per_migration=True,  # each migration included into a separate transaction
+            process_revision_directives=process_revision_directives,
+        )
         with context.begin_transaction():
             context.run_migrations()
 

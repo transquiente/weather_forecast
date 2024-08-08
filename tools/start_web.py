@@ -1,7 +1,8 @@
 from fastapi import APIRouter, FastAPI
 
 from app.core.constants import APP_VERSION_PREFIX
-from app.core.repository.sql.db import session_maker_factory
+from app.core.repository.sql import session_maker_factory
+from app.core.web import configure_cors, configure_error_handlers
 from app.location.web import router as location_router
 
 v01_router = APIRouter(prefix=APP_VERSION_PREFIX)
@@ -14,6 +15,8 @@ def configure_app(app: FastAPI) -> None:
 
 def do_app_core_configuration(app: FastAPI) -> None:
     app.state.session_maker = session_maker_factory()
+    configure_cors(app)
+    configure_error_handlers(app)
 
 
 def configure_routes(app: FastAPI) -> None:

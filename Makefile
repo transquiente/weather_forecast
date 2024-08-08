@@ -43,7 +43,7 @@ lint:
 format:
 # Sorting imports
 	@poetry run ruff check --select I --fix .
-# Lint all files in the current directory, and fix any fixable errors.
-	@poetry run ruff check --fix .
 # Format all files in the current directory.
 	@poetry run ruff format .
+# Lint all files in the current directory, and fix any fixable errors.
+	@poetry run ruff check --fix .

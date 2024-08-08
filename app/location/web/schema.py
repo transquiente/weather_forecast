@@ -11,6 +11,7 @@ class LocationSchema(BaseSchema):
     city: str | None
     street_address: str | None
     zip_code: str | None
+    location_key: str | None
 
     class Config:
         from_attributes = True

@@ -33,3 +33,11 @@ class DataclassBase(MappedAsDataclass, Base, kw_only=True):
 
 UUID_PK = Annotated[UUID, mapped_column(primary_key=True, server_default=text("gen_random_uuid()"))]
 DATETIME_CREATED = Annotated[datetime, mapped_column(server_default=text("now()"))]
+DATETIME_UPDATED = Annotated[datetime, mapped_column(server_default=text("now()"), onupdate=text("now()"))]
+
+
+"""
+location_key,latitude,longitude
+1511980,35.685365,139.753303
+228558,3.096889,101.661623
+"""

@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.interfaces import ORMOption
 
-from app.core.repository.sql.error import ObjectNotFound
+from app.core.repository.sql.exception import ObjectNotFound
 from app.core.repository.sql.interface import IBaseRepository
 
 

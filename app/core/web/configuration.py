@@ -1,6 +1,6 @@
 from typing import TypeVar
 
-from fastapi import FastAPI, status
+from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError as PydanticValidationError
 from starlette.middleware.cors import CORSMiddleware
@@ -29,7 +29,7 @@ def add_exception_handler(
     exception_type: ExceptionType,
     status_code: int,
 ) -> None:
-    def handler(exception: Exception) -> JSONResponse:
+    def handler(request: Request, exception: Exception) -> JSONResponse:
         return JSONResponse(
             status_code=status_code,
             content={"message": str(exception)},
@@ -43,10 +43,13 @@ def add_pydantic_validation_error_exception_handler(
     exception_type: PydanticValidationErrorType,
     status_code: int,
 ) -> None:
-    def handler(exception: PydanticValidationError) -> JSONResponse:
+    def handler(request: Request, exception: PydanticValidationError) -> JSONResponse:
+        errors = exception.errors()
+        for error in errors:
+            error.pop("input", None)
         return JSONResponse(
             status_code=status_code,
-            content={"detail": exception.errors()},
+            content={"detail": errors},
         )
 
     app.add_exception_handler(exception_type, handler)  # type: ignore

@@ -6,7 +6,6 @@ from app.core.repository.sql import UnitOfWork, get_uow
 from app.core.schema import ErrorMessageSchema
 from app.location.client import ILocationClient
 from app.location.dependency import get_location_client, get_location_repository
-from app.location.domain import Location
 from app.location.interface import ILocationRepository
 from app.location.use_case import (
     CreateLocationUseCase,
@@ -31,7 +30,7 @@ def create_location(
     uow: UnitOfWork = Depends(get_uow),
     location_repository: ILocationRepository = Depends(get_location_repository),
     location_client: ILocationClient = Depends(get_location_client),
-) -> Location:
+) -> LocationSchema:
     use_case = CreateLocationUseCase(uow, location_repository, location_client)
     return use_case.execute(location_dto)
 
@@ -65,7 +64,7 @@ def update_location(
     uow: UnitOfWork = Depends(get_uow),
     location_repository: ILocationRepository = Depends(get_location_repository),
     location_client: ILocationClient = Depends(get_location_client),
-) -> Location:
+) -> LocationSchema:
     use_case = UpdateLocationUseCase(uow, location_repository, location_client)
     return use_case.execute(location_id, location_dto)
 

@@ -3,7 +3,6 @@ from uuid import UUID
 
 from app.core.repository.sql import UnitOfWork
 from app.location.client import ILocationClient
-from app.location.domain import Location
 from app.location.interface import ILocationRepository
 from app.location.web.dto import CreateLocationDTO, UpdateLocationDTO
 from app.location.web.schema import LocationSchema
@@ -15,7 +14,7 @@ class CreateLocationUseCase:
     location_repository: ILocationRepository
     location_client: ILocationClient
 
-    def execute(self, location_dto: CreateLocationDTO) -> Location:
+    def execute(self, location_dto: CreateLocationDTO) -> LocationSchema:
         location_from_location_client = self.location_client.get_location(
             latitude=location_dto.latitude,
             longitude=location_dto.longitude,
@@ -24,7 +23,8 @@ class CreateLocationUseCase:
             location = location_dto.from_dto(location_from_location_client)
             self.location_repository.add(location)
         location = self.location_repository.get(location.id, load_refreshed=True)
-        return location
+        location_schema: LocationSchema = LocationSchema.model_validate(location)
+        return location_schema
 
 
 @dataclass
@@ -43,7 +43,7 @@ class UpdateLocationUseCase:
     location_repository: ILocationRepository
     location_client: ILocationClient
 
-    def execute(self, location_id: UUID, location_dto: UpdateLocationDTO) -> Location:
+    def execute(self, location_id: UUID, location_dto: UpdateLocationDTO) -> LocationSchema:
         updated_location_from_location_client = None
         location = self.location_repository.get(location_id)
         if (
@@ -59,7 +59,8 @@ class UpdateLocationUseCase:
             location = location_dto.update_from_dto(location, updated_location_from_location_client)
             self.location_repository.add(location)
         location = self.location_repository.get(location.id, load_refreshed=True)
-        return location
+        location_schema: LocationSchema = LocationSchema.model_validate(location)
+        return location_schema
 
 
 @dataclass

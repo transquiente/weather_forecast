@@ -46,11 +46,11 @@ class LocationClient(ILocationClient):
             q=f"{latitude},{longitude}",
         )
         response_json = self._make_request(
-            method="POST",
+            method="GET",
             url=f"{self.base_url}/{self.location_url}",
             params=dto.model_dump(mode="json"),
         )
-        response: LocationClientLocationSchema = LocationClientLocationSchema.parse_obj(response_json)
+        response: LocationClientLocationSchema = LocationClientLocationSchema.model_validate(response_json)
         return response
 
     def _make_request(self, method: str, url: str, **kwargs) -> dict:

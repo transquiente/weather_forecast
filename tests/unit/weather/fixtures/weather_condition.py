@@ -36,7 +36,7 @@ class WeatherConditionFactory(factory.Factory):
 
     id = factory.LazyFunction(uuid4)
     data_type = WeatherDataType.CURRENT_CONDITION
-    date_time = factory.LazyFunction(lambda: datetime.now(tz=timezone.utc))
+    date_time = factory.LazyFunction(lambda: datetime.now(tz=timezone.utc).replace(tzinfo=None))
     weather_text = factory.Sequence(lambda wtxt: f"weather text {wtxt}")
     has_precipitation = factory.LazyFunction(lambda: randint(0, 1) == 1)
     precipitation_type = PrecipitationType.RAIN

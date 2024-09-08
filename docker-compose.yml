@@ -22,6 +22,21 @@ services:
       - "5434:5432"
     volumes:
       - postgres:/var/lib/postgresql/data
+  test:
+    build:
+      dockerfile: deployment/Dockerfile
+      target: test
+    env_file:
+      - ./deployment/docker.env
+    environment:
+      - DB_DATABASE=postgres_test
+    depends_on:
+      - postgres
+    volumes:
+      - ./app:/app/app
+      - ./migrations:/app/migrations
+      - ./tests:/app/tests
+      - ./tools:/app/tools
 
 volumes:
   postgres:

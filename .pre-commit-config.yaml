@@ -8,6 +8,10 @@ repos:
     -   id: check-merge-conflict
     -   id: mixed-line-ending
     -   id: name-tests-test
+        language: python
+        types: [ python ]
+        args: ['--pytest-test-first']
+        exclude: ^.*/fixtures/.*
 # pre-commit hook for mypy
 -   repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.11.0

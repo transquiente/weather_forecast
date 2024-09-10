@@ -5,6 +5,8 @@ from sqlalchemy import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from tests.integration.core.fixtures.unit_of_work import unit_of_work  # noqa: F401
+from tests.integration.location.fixtures import location_repository  # noqa: F401
+from tests.integration.weather.fixtures import weather_condition_repository  # noqa: F401
 
 
 @pytest.fixture(autouse=True)

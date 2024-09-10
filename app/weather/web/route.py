@@ -8,7 +8,7 @@ from app.location.dependency import get_location_repository
 from app.location.interface import ILocationRepository
 from app.weather.client import IWeatherClient
 from app.weather.constant import WeatherDataType
-from app.weather.dependancy import get_weather_client, get_weather_condition_repository
+from app.weather.dependency import get_weather_client, get_weather_condition_repository
 from app.weather.domain import WeatherCondition
 from app.weather.interface import IWeatherConditionRepository
 from app.weather.use_case import (

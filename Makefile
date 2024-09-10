@@ -47,3 +47,6 @@ format:
 	@poetry run ruff format .
 # Lint all files in the current directory, and fix any fixable errors.
 	@poetry run ruff check --fix .
+
+test:
+	@DB_DATABASE=postgres_test poetry run pytest -s $(args)

@@ -65,6 +65,7 @@ class WeatherClient(IWeatherClient):
         response: WeatherClientWeatherCurrentConditionSchema = (
             WeatherClientWeatherCurrentConditionSchema.model_validate(current_weather_condition)
         )
+        print(current_weather_condition)
         return response
 
     def get_weather_forecast_for_location(
@@ -94,6 +95,7 @@ class WeatherClient(IWeatherClient):
             ),
             response[0],
         )
+        print(response_json[1])
         return next_hour_forecast
 
     def _make_request(self, method: str, url: str, **kwargs) -> list:

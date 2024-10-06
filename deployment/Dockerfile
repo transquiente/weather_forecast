@@ -26,7 +26,7 @@ CMD alembic upgrade head
 CMD uvicorn --factory tools.start_web:create_app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips "*"
 
 FROM app-base AS test
-COPY --from=builder-dev /venv /venv
+COPY --from=builder /venv /venv
 ENV PATH="/venv/bin:$PATH"
 COPY tests /app/tests
 USER nonroot

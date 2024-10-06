@@ -3,7 +3,7 @@ name: Deploy to Vercel
 on:
   push:
     branches:
-      - main  # Automatically deploy on push to the main branch
+      - dev  # Automatically deploy on push to the dev branch
   pull_request:
 
 jobs:
@@ -17,7 +17,7 @@ jobs:
           POSTGRES_USER: ${{ secrets.DB_USERNAME }}
           POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
         ports:
-          - ${{ secrets.DB_PORT }}:5432
+          - 5432:5432
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -34,7 +34,7 @@ jobs:
         run: poetry install
       - name: Wait for PostgreSQL to be ready
         run: |
-          while ! pg_isready -h localhost -p ${{ secrets.DB_PORT }}; do
+          while ! pg_isready -h localhost -p 5432; do
             echo "Waiting for PostgreSQL to be ready..."
             sleep 5
           done
@@ -51,9 +51,17 @@ jobs:
           LOCATION_BASE_URL: ${{ secrets.LOCATION_BASE_URL }}
           WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
           WEATHER_BASE_URL: ${{ secrets.WEATHER_BASE_URL }}
-        run: poetry run make run
+        run: poetry run make up
       - name: Run Alembic migrations
-        run: poetry run make migrate
+        env:
+          DB_DATABASE: ${{ secrets.DB_DATABASE }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_MAX_OVERFLOW: ${{ secrets.DB_MAX_OVERFLOW }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_POOL_SIZE: ${{ secrets.DB_POOL_SIZE }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+        run: poetry run alembic upgrade head
       - name: Deploy to Vercel
         run: |
           npm i -g vercel

@@ -1,0 +1,62 @@
+name: Deploy to Vercel
+
+on:
+  push:
+    branches:
+      - es-vercel-deploy  # Automatically deploy on push to the main branch
+  pull_request:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16.3-alpine
+        env:
+          POSTGRES_DB: ${{ secrets.DB_DATABASE }}
+          POSTGRES_USER: ${{ secrets.DB_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        ports:
+          - ${{ secrets.DB_PORT }}:5432
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install poetry
+        run: pipx install poetry
+      - name: Set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: pyproject.toml
+          cache: 'poetry'
+      - name: Switch to env
+        run: poetry env use python3.10
+      - name: Install dependencies
+        run: poetry install
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          while ! pg_isready -h localhost -p ${{ secrets.DB_PORT }}; do
+            echo "Waiting for PostgreSQL to be ready..."
+            sleep 5
+          done
+      - name: Start Docker containers
+        env:
+          DB_DATABASE: ${{ secrets.DB_DATABASE }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_MAX_OVERFLOW: ${{ secrets.DB_MAX_OVERFLOW }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_POOL_SIZE: ${{ secrets.DB_POOL_SIZE }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          LOCATION_API_KEY: ${{ secrets.LOCATION_API_KEY }}
+          LOCATION_BASE_URL: ${{ secrets.LOCATION_BASE_URL }}
+          WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+          WEATHER_BASE_URL: ${{ secrets.WEATHER_BASE_URL }}
+        run: poetry run make run
+      - name: Run Alembic migrations
+        run: poetry run make migrate
+      - name: Deploy to Vercel
+        run: |
+          npm i -g vercel
+          vercel --token=$VERCEL_TOKEN --prod
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}

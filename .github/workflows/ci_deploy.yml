@@ -51,7 +51,7 @@ jobs:
           LOCATION_BASE_URL: ${{ secrets.LOCATION_BASE_URL }}
           WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
           WEATHER_BASE_URL: ${{ secrets.WEATHER_BASE_URL }}
-        run: poetry run make run
+        run: poetry run make up
       - name: Run Alembic migrations
         run: poetry run make migrate
       - name: Deploy to Vercel

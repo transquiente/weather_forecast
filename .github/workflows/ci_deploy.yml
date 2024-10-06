@@ -17,7 +17,7 @@ jobs:
           POSTGRES_USER: ${{ secrets.DB_USERNAME }}
           POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
         ports:
-          - ${{ secrets.DB_PORT }}:5432
+          - 5432:5432
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -34,7 +34,7 @@ jobs:
         run: poetry install
       - name: Wait for PostgreSQL to be ready
         run: |
-          while ! pg_isready -h localhost -p ${{ secrets.DB_PORT }}; do
+          while ! pg_isready -h localhost -p 5432; do
             echo "Waiting for PostgreSQL to be ready..."
             sleep 5
           done

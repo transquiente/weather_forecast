@@ -61,7 +61,7 @@ jobs:
           DB_POOL_SIZE: ${{ secrets.DB_POOL_SIZE }}
           DB_PORT: ${{ secrets.DB_PORT }}
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
-        run: poetry run make migrate
+        run: poetry run alembic upgrade head
       - name: Deploy to Vercel
         run: |
           npm i -g vercel

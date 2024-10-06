@@ -53,6 +53,14 @@ jobs:
           WEATHER_BASE_URL: ${{ secrets.WEATHER_BASE_URL }}
         run: poetry run make up
       - name: Run Alembic migrations
+        env:
+          DB_DATABASE: ${{ secrets.DB_DATABASE }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_MAX_OVERFLOW: ${{ secrets.DB_MAX_OVERFLOW }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_POOL_SIZE: ${{ secrets.DB_POOL_SIZE }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
         run: poetry run make migrate
       - name: Deploy to Vercel
         run: |

@@ -1,4 +1,9 @@
+setup:
+  addons:
+    - plan: heroku-postgresql:essential-0
+      as: DATABASE
 build:
   docker:
-    web: deployment/Dockerfile
-    target: deploy-app
+    web:
+      dockerfile: deployment/Dockerfile
+      target: deploy-app

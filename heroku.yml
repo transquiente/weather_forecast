@@ -1,0 +1,4 @@
+build:
+  docker:
+    web: deployment/Dockerfile
+    target: deploy-app

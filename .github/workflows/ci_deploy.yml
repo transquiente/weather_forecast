@@ -12,6 +12,7 @@ jobs:
     uses: './.github/workflows/ci_code_validation.yml'
 
   build-deploy:
+    needs: code-validation
     runs-on: ubuntu-latest
 
     steps:

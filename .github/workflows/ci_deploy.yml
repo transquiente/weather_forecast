@@ -1,44 +1,33 @@
-name: Deploy to Vercel
+name: CI/CD to Heroku
 
 on:
   push:
     branches:
-      - dev  # Automatically deploy on push to the dev branch
-  pull_request:
+      - dev  # Triggers the workflow on push to the selected branch
 
 jobs:
-  deploy:
+  code-validation:
+    name: Code Validation
+    secrets: inherit
+    uses: './.github/workflows/ci_code_validation.yml'
+
+  build-deploy:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16.3-alpine
-        env:
-          POSTGRES_DB: ${{ secrets.DB_DATABASE }}
-          POSTGRES_USER: ${{ secrets.DB_USERNAME }}
-          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        ports:
-          - 5432:5432
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Install poetry
-        run: pipx install poetry
-      - name: Set up python
-        uses: actions/setup-python@v5
-        with:
-          python-version-file: pyproject.toml
-          cache: 'poetry'
-      - name: Switch to env
-        run: poetry env use python3.10
-      - name: Install dependencies
-        run: poetry install
-      - name: Wait for PostgreSQL to be ready
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Heroku Container Registry
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
-          while ! pg_isready -h localhost -p 5432; do
-            echo "Waiting for PostgreSQL to be ready..."
-            sleep 5
-          done
-      - name: Start Docker containers
+          echo $HEROKU_API_KEY | docker login --username=_ --password-stdin registry.heroku.com
+
+      - name: Build and push Docker image to Heroku
         env:
           DB_DATABASE: ${{ secrets.DB_DATABASE }}
           DB_HOST: ${{ secrets.DB_HOST }}
@@ -51,8 +40,11 @@ jobs:
           LOCATION_BASE_URL: ${{ secrets.LOCATION_BASE_URL }}
           WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
           WEATHER_BASE_URL: ${{ secrets.WEATHER_BASE_URL }}
-        run: poetry run make up
-      - name: Run Alembic migrations
+        run: |
+          docker build -f deployment/Dockerfile --target app-base -t registry.heroku.com/weather-forecast-es/web .
+          docker push registry.heroku.com/weather-forecast-es/web
+
+      - name: Release app on Heroku
         env:
           DB_DATABASE: ${{ secrets.DB_DATABASE }}
           DB_HOST: ${{ secrets.DB_HOST }}
@@ -61,10 +53,19 @@ jobs:
           DB_POOL_SIZE: ${{ secrets.DB_POOL_SIZE }}
           DB_PORT: ${{ secrets.DB_PORT }}
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
-        run: poetry run alembic upgrade head
-      - name: Deploy to Vercel
-        run: |
-          npm i -g vercel
-          vercel --token=$VERCEL_TOKEN --prod
-    env:
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          LOCATION_API_KEY: ${{ secrets.LOCATION_API_KEY }}
+          LOCATION_BASE_URL: ${{ secrets.LOCATION_BASE_URL }}
+          WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+          WEATHER_BASE_URL: ${{ secrets.WEATHER_BASE_URL }}
+        run: heroku container:release web --app weather-forecast-es
+
+      - name: Run Alembic migrations (if using)
+        env:
+          DB_DATABASE: ${{ secrets.DB_DATABASE }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_MAX_OVERFLOW: ${{ secrets.DB_MAX_OVERFLOW }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_POOL_SIZE: ${{ secrets.DB_POOL_SIZE }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+        run: heroku run alembic upgrade head --app weather-forecast-es
